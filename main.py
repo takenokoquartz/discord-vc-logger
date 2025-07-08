@@ -42,18 +42,17 @@ async def unwatch(interaction: discord.Interaction, vc_channel: discord.VoiceCha
 
 @bot.event
 async def on_voice_state_update(member, before, after):
-    # VC 参加
-    if after.channel and after.channel.id in vc_watch_targets:
-        text_channel = bot.get_channel(vc_watch_targets[after.channel.id])
-        if text_channel:
-            await text_channel.send(f"🔔 {member.display_name} が VC「{after.channel.name}」に参加しました。")
-
-    # VC 退出
-    if before.channel and before.channel.id in vc_watch_targets:
+    # 退出処理（VCが変わった場合のみ）
+    if before.channel and before.channel != after.channel and before.channel.id in vc_watch_targets:
         text_channel = bot.get_channel(vc_watch_targets[before.channel.id])
         if text_channel:
             await text_channel.send(f"👋 {member.display_name} が VC「{before.channel.name}」から退出しました。")
 
+    # 参加処理（VCが変わった場合のみ）
+    if after.channel and before.channel != after.channel and after.channel.id in vc_watch_targets:
+        text_channel = bot.get_channel(vc_watch_targets[after.channel.id])
+        if text_channel:
+            await text_channel.send(f"🔔 {member.display_name} が VC「{after.channel.name}」に参加しました。")
 # Replit 上で動かし続けるための keep_alive
 keep_alive()
 
